@@ -26,67 +26,33 @@ def combinablePromotions(promotionCode: String, allPromotions: Seq[Promotion]): 
 
     val combos = (2 to seed.length).flatMap(seed.combinations(_))
     
-    //combos.foreach(combo => println(combo))
 
-
-    val x = combos.filter { combo => 
-        println(combo)
-        combo.map { promotion =>
-            val j = combo.filter(_ != promotion).map ( oPromotion => comboMap(promotion).contains(oPromotion) )
-            println(combo, j)
-            j
-        }.contains(false) 
+    val validCombos = combos.filter { combo => 
+        ! combo.flatMap { promotion =>
+            combo.filter(_ != promotion).map ( oPromotion => comboMap(promotion).contains(oPromotion) )
+        }.contains(false)
     }
 
-    println(x)
-    /*
-    codes.map( code => {
-        comboMap(code).reduce(List[String]()) { (acc, p) =>
+    val subCombos = validCombos.flatMap { combo => 
+        (2 to combo.length).flatMap(combo.combinations(_)).filter(_ != combo).toList
+    }
 
+    val longestCombos = validCombos.filter { combo => ! subCombos.contains(combo) }
 
-            acc + (p.code, )
-        }
-        
+    longestCombos.map(combo => PromotionCombo(combo.sorted))
 
-    })
-    */
-
-
-
-    null
 
 
 }
 
 def allCombinablePromotions(allPromotions: Seq[Promotion]): Seq[PromotionCombo] =  {
 
-    
+    getComboMap(allPromotions)
+    .keys
+    .flatMap( promo => combinablePromotions(promo, allPromotions))
+    .toSeq
 
 
-
-
-    /*
-
-    val promotions = comboMap.keys
-
-    println(promotions)
-
-    */
-
-
-    /*
-    comboMap.map { case (p, combs) => 
-        
-
-        combs.filter(c => comboMap(c))
-
-    }
-    */
-
-
-    
-
-    null
 }
 
 
@@ -103,8 +69,8 @@ val promotions = Seq(
     Promotion("P5", Seq("P2"))
 )
 
-//val result = allCombinablePromotions(promotions)
-//println(result)
+println("All:"+allCombinablePromotions(promotions))
 
-val result = combinablePromotions("P1", promotions)
-println(result)
+
+println("P1:"+combinablePromotions("P1", promotions))
+println("P3:"+combinablePromotions("P3", promotions))
